@@ -10,6 +10,7 @@ import imageio_ffmpeg as ffmpeg
 
 # Set the FFmpeg executable path to the binary provided by imageio
 os.environ["FFMPEG_BINARY"] = ffmpeg.get_ffmpeg_exe()
+
 # Set page configuration
 st.set_page_config(
     page_title='HealthCare Translation APP',
@@ -46,26 +47,22 @@ def main():
     selected_language = st.selectbox("Select the target language", list(supported_languages.keys()))
     target_lang_code = supported_languages[selected_language]
 
-    # Audio input
-    try:
-        audio_bytes = st.experimental_audio_input("Record a voice message")
-    except Exception as e:
-        st.error(f"Error during audio input: {e}")
-        return
+    # Audio input using file uploader
+    audio_file = st.file_uploader("Upload an audio file", type=["mp3", "wav", "m4a"])
 
-    if audio_bytes:
-        st.audio(audio_bytes)
-        st.session_state.audio_bytes = audio_bytes
+    if audio_file:
+        st.audio(audio_file)
+        st.session_state.audio_bytes = audio_file.getvalue()
 
     # Form for real-time translation
     with st.form('input_form'):
         submit_button = st.form_submit_button(label='Translate', type='primary')
-        if submit_button and 'audio_bytes' in st.session_state and st.session_state.audio_bytes.size > 0:
+        if submit_button and 'audio_bytes' in st.session_state and st.session_state.audio_bytes:
             try:
                 # Save audio input as a temporary file
                 audio_file_path = "temp_audio.wav"
                 with open(audio_file_path, "wb") as audio_file:
-                    audio_file.write(st.session_state.audio_bytes.getvalue())
+                    audio_file.write(st.session_state.audio_bytes)
 
                 # Load and use Whisper model for transcription
                 model = whisper.load_model("base")
