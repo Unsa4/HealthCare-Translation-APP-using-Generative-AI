@@ -6,8 +6,14 @@ from io import BytesIO
 import openai
 import imageio_ffmpeg as ffmpeg
 
-# Set FFmpeg executable path
-os.environ["FFMPEG_BINARY"] = ffmpeg.get_ffmpeg_exe() 
+# Explicitly get the path to FFmpeg binary using imageio_ffmpeg
+ffmpeg_path = ffmpeg.get_ffmpeg_exe()
+
+# Check if ffmpeg binary exists and set the environment variable
+if not os.path.exists(ffmpeg_path):
+    st.error(f"FFmpeg not found at {ffmpeg_path}. Please ensure FFmpeg is installed and the path is correct.")
+else:
+    os.environ["FFMPEG_BINARY"] = ffmpeg_path  # Set FFmpeg path
 # Set page configuration
 st.set_page_config(
     page_title='HealthCare Translation APP',
