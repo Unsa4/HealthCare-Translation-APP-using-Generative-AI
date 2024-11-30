@@ -6,8 +6,10 @@ from io import BytesIO
 import openai
 
 # Set FFmpeg executable path
-os.environ["PATH"] += os.pathsep + r"C:\Users\HP\Downloads\ffmpeg-master-latest-win64-gpl\ffmpeg-master-latest-win64-gpl\bin"
+import imageio_ffmpeg as ffmpeg
 
+# Set the FFmpeg executable path to the binary provided by imageio
+os.environ["FFMPEG_BINARY"] = ffmpeg.get_ffmpeg_exe()
 # Set page configuration
 st.set_page_config(
     page_title='HealthCare Translation APP',
