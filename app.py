@@ -29,7 +29,6 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 def main():
     st.header('HealthCare Translation APP')
-    st.caption('Written by LPM')
 
     # Language selection
     supported_languages = {
