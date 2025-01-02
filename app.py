@@ -4,10 +4,11 @@ from gtts import gTTS
 import streamlit as st
 from io import BytesIO
 import openai
-import imageio_ffmpeg as ffmpeg
 
-# Set FFmpeg executable path
-os.environ["PATH"] += os.pathsep + r"C:\Users\HP\Downloads\ffmpeg-master-latest-win64-gpl\ffmpeg-master-latest-win64-gpl\bin"
+# Set FFmpeg executable path from secrets.toml
+ffmpeg_path = st.secrets["ffmpeg"]["path"]
+os.environ["PATH"] += os.pathsep + ffmpeg_path
+
 # Set page configuration
 st.set_page_config(
     page_title='HealthCare Translation APP',
@@ -127,3 +128,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
