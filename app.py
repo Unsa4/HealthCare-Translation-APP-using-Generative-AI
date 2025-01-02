@@ -1,15 +1,17 @@
 import os
-import wave
 import whisper
 from gtts import gTTS
 import streamlit as st
 from io import BytesIO
 import openai
+import imageio_ffmpeg as ffmpeg
 
+# Set FFmpeg executable path
+os.environ["PATH"] += os.pathsep + r"C:\Users\HP\Downloads\ffmpeg-master-latest-win64-gpl\ffmpeg-master-latest-win64-gpl\bin"
 # Set page configuration
 st.set_page_config(
     page_title='HealthCare Translation APP',
-    page_icon='🧟🏽‍⚕️🌎',
+    page_icon='🧑🏽‍⚕️🌎',
     layout='centered',
     initial_sidebar_state='auto'
 )
@@ -24,20 +26,6 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # Initialize OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
-
-# Function to save audio bytes as WAV
-def save_audio_as_wav(audio_bytes, output_path):
-    try:
-        # Open the output WAV file
-        with wave.open(output_path, "wb") as wav_file:
-            # Set WAV file parameters
-            wav_file.setnchannels(1)  # Mono channel
-            wav_file.setsampwidth(2)  # 16-bit samples
-            wav_file.setframerate(16000)  # 16 kHz sample rate
-            # Write audio bytes to WAV file
-            wav_file.writeframes(audio_bytes)
-    except Exception as e:
-        raise RuntimeError(f"Error converting audio to WAV format: {e}")
 
 def main():
     st.header('HealthCare Translation APP')
@@ -57,25 +45,26 @@ def main():
 
     # Audio input
     try:
-        audio_bytes = st.file_uploader("Upload a voice message (audio file)", type=["wav", "mp3", "m4a"])
+        audio_bytes = st.experimental_audio_input("Record a voice message")
     except Exception as e:
         st.error(f"Error during audio input: {e}")
         return
 
     if audio_bytes:
         st.audio(audio_bytes)
-        st.session_state.audio_bytes = audio_bytes.read()
+        st.session_state.audio_bytes = audio_bytes
 
     # Form for real-time translation
     with st.form('input_form'):
         submit_button = st.form_submit_button(label='Translate', type='primary')
-        if submit_button and 'audio_bytes' in st.session_state:
+        if submit_button and 'audio_bytes' in st.session_state and st.session_state.audio_bytes.size > 0:
             try:
-                # Save audio input as a WAV file
+                # Save audio input as a temporary file
                 audio_file_path = "temp_audio.wav"
-                save_audio_as_wav(st.session_state.audio_bytes, audio_file_path)
+                with open(audio_file_path, "wb") as audio_file:
+                    audio_file.write(st.session_state.audio_bytes.getvalue())
 
-                # Use Whisper model for transcription
+                # Load and use Whisper model for transcription
                 model = whisper.load_model("base")
                 result = model.transcribe(audio_file_path)
 
