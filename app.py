@@ -4,14 +4,11 @@ from gtts import gTTS
 import streamlit as st
 from io import BytesIO
 import openai
-import imageio_ffmpeg as ffmpeg
 
-# Set FFmpeg executable path
-os.environ["PATH"] += os.pathsep + r"C:\Users\HP\Downloads\ffmpeg-master-latest-win64-gpl\ffmpeg-master-latest-win64-gpl\bin"
 # Set page configuration
 st.set_page_config(
     page_title='HealthCare Translation APP',
-    page_icon='🧑🏽‍⚕️🌎',
+    page_icon='🧟🏽‍⚕️🌎',
     layout='centered',
     initial_sidebar_state='auto'
 )
@@ -64,7 +61,7 @@ def main():
                 with open(audio_file_path, "wb") as audio_file:
                     audio_file.write(st.session_state.audio_bytes.getvalue())
 
-                # Load and use Whisper model for transcription
+                # Use Whisper model for transcription
                 model = whisper.load_model("base")
                 result = model.transcribe(audio_file_path)
 
